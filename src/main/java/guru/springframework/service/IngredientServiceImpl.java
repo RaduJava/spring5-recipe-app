@@ -76,15 +76,16 @@ public class IngredientServiceImpl implements IngredientService {
                 Ingredient ingredient = ingredientCommandToIngredient.convert(command);
                 ingredient.setRecipe(recipe);
                 recipe.addIngredient(ingredient);
-                recipe.addIngredient(ingredientCommandToIngredient.convert(command));
+                System.out.println();
             }
 
             Recipe savedRecipe = recipeRepository.save(recipe);
             Optional<Ingredient> savedIngredientOptional = savedRecipe.getIngredients().stream()
                     .filter(recipeIngredients -> recipeIngredients.getId().equals(command.getId()))
                     .findFirst();
+            System.out.println("sou");
             //to do check for fail
-            if(!savedIngredientOptional.isPresent()){
+            if (!savedIngredientOptional.isPresent()) {
                 //not totally safe... But best guess
                 savedIngredientOptional = savedRecipe.getIngredients().stream()
                         .filter(recipeIngredients -> recipeIngredients.getDescription().equals(command.getDescription()))
@@ -97,5 +98,26 @@ public class IngredientServiceImpl implements IngredientService {
             return ingredientToIngredientCommand.convert(savedIngredientOptional.get());
         }
 
+    }
+
+    @Override
+    @Transactional
+    public void deleteById(Long recipeId, Long ingredientId) {
+        Optional<Recipe> recipeOptional = recipeRepository.findById(recipeId);
+
+        if (!recipeOptional.isPresent()) {
+            log.debug("There is no such element");
+        }
+        Recipe recipe = recipeOptional.get();
+
+        Ingredient ingredient = recipe
+                .getIngredients()
+                .stream()
+                .filter(s -> s.getId().equals(ingredientId))
+                .findFirst()
+                .get();
+        recipe.getIngredients().remove(ingredient);
+        ingredient.setRecipe(null);
+        recipeRepository.save(recipe);
     }
 }

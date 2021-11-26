@@ -8,34 +8,42 @@ import org.junit.Test;
 import static org.junit.Assert.*;
 
 public class UnitOfMeasureCommandToUnitOfMeasureTest {
-    private static final String DESCRIPTION = "description";
-    private static final Long LONG_VALUE = new Long(1l);
-    private UnitOfMeasureCommandToUnitOfMeasure converter;
+    public static final String DESCRIPTION = "description";
+    public static final Long LONG_VALUE = new Long(1L);
+
+    UnitOfMeasureCommandToUnitOfMeasure converter;
 
     @Before
     public void setUp() throws Exception {
         converter = new UnitOfMeasureCommandToUnitOfMeasure();
+
     }
 
     @Test
-    public void convertToNull() {
-        assertNotNull(converter.convert(new UnitOfMeasureCommand()));
-    }
-
-    @Test
-    public void convertToEmptyObject() {
+    public void testNullParamter() throws Exception {
         assertNull(converter.convert(null));
     }
 
     @Test
-    public void convert() {
-        UnitOfMeasureCommand uniteOfMeasureComand = new UnitOfMeasureCommand();
-        uniteOfMeasureComand.setId(LONG_VALUE);
-        uniteOfMeasureComand.setDescription(DESCRIPTION);
-
-        UnitOfMeasure unitOfMeasure = converter.convert(uniteOfMeasureComand);
-        assertNotNull(unitOfMeasure);
-        assertEquals(DESCRIPTION, unitOfMeasure.getDescription());
-        assertEquals(LONG_VALUE, unitOfMeasure.getId());
+    public void testEmptyObject() throws Exception {
+        assertNotNull(converter.convert(new UnitOfMeasureCommand()));
     }
+
+    @Test
+    public void convert() throws Exception {
+        //given
+        UnitOfMeasureCommand command = new UnitOfMeasureCommand();
+        command.setId(LONG_VALUE);
+        command.setDescription(DESCRIPTION);
+
+        //when
+        UnitOfMeasure uom = converter.convert(command);
+
+        //then
+        assertNotNull(uom);
+        assertEquals(LONG_VALUE, uom.getId());
+        assertEquals(DESCRIPTION, uom.getDescription());
+
+    }
+
 }

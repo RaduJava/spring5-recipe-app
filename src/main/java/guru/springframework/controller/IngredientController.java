@@ -3,7 +3,6 @@ package guru.springframework.controller;
 import guru.springframework.commands.IngredientCommand;
 import guru.springframework.commands.RecipeCommand;
 import guru.springframework.commands.UnitOfMeasureCommand;
-import guru.springframework.domain.Recipe;
 import guru.springframework.service.IngredientService;
 import guru.springframework.service.RecipeService;
 import guru.springframework.service.UnitOfMeasureService;
@@ -11,8 +10,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.Set;
 
 @Controller
 @Slf4j
@@ -29,7 +26,7 @@ public class IngredientController {
 
     @GetMapping
     @RequestMapping("recipe/{recipeId}/ingredient/new")
-    public String newIngredient(@PathVariable String recipeId, Model model){
+    public String newIngredient(@PathVariable String recipeId, Model model) {
 
         //make sure we have a good id value
         RecipeCommand recipeCommand = recipeService.findCommandById(Long.valueOf(recipeId));
@@ -38,20 +35,20 @@ public class IngredientController {
         //need to return back parent id for hidden form property
         IngredientCommand ingredientCommand = new IngredientCommand();
         ingredientCommand.setRecipeId(Long.valueOf(recipeId));
+
         model.addAttribute("ingredient", ingredientCommand);
 
         //init uom
         ingredientCommand.setUom(new UnitOfMeasureCommand());
 
-        model.addAttribute("uomList",  unitOfMeasureService.listAllUoms());
+        model.addAttribute("uomList", unitOfMeasureService.listAllUoms());
 
         return "recipe/ingredient/ingredientform";
     }
 
 
-    @GetMapping
-    @RequestMapping("/recipe/{recipeId}/ingredients")
-    public String listIngredients(@PathVariable String recipeId, Model model){
+    @GetMapping("/recipe/{recipeId}/ingredients")
+    public String listIngredients(@PathVariable String recipeId, Model model) {
         log.debug("Getting ingredient list for recipe id: " + recipeId);
 
         // use command object to avoid lazy load errors in Thymeleaf.
@@ -83,5 +80,12 @@ public class IngredientController {
         log.debug("saved ingredient id:" + savedCommand.getId());
 
         return "redirect:/recipe/" + savedCommand.getRecipeId() + "/ingredient/" + savedCommand.getId() + "/show";
+    }
+
+    @GetMapping
+    @RequestMapping("/recipe/{recipeId}/ingredient/{ingredientId}/delete")
+    public String deleteIngredient(@PathVariable String recipeId, @PathVariable String ingredientId) {
+        ingredientService.deleteById(Long.valueOf(recipeId), Long.valueOf(ingredientId));
+        return "redirect:/recipe/{recipeId}/ingredients";
     }
 }
